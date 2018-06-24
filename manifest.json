@@ -3,19 +3,24 @@
     "version": "1.0",
     "description": "Facilitar la matricula en el TEC",
     "permissions": ["storage", "activeTab"],
+    "manifest_version": 2,
     "background": {
       "scripts": ["background.js"],
       "persistent": false
     },
-    "page_action": {
-      "default_popup": "popup.html"
-    }, 
     "content_scripts": [
       {
-        "matches": ["https://tec-appsext.itcr.ac.cr/Matricula/frmMatricula.aspx"],
+        "matches": ["<all_urls>"],
         "css": ["myStyles.css"],
         "js": ["contentScript.js"]
       }
     ],
-    "manifest_version": 2
+    "browser_action": {
+      "default_icon": {
+        "16": "icon.png",
+        "24": "icon.png",
+        "32": "icon.png"
+      }
+    },
+    "web_accessible_resources": ["script.js", "ReloadSingle.png", "ReloadGif.gif"]
   }

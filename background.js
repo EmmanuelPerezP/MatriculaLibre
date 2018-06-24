@@ -2,10 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// 'use strict';
+chrome.browserAction.onClicked.addListener(buttonClick);
 
-// chrome.runtime.onInstalled.addListener(function() {
-//   chrome.storage.sync.set({color: '#3aa757'}, function() {
-//     console.log("The color is green.");
+function buttonClick(tab){
+  let msg = {
+    txt: "runScript"
+  }
+  chrome.tabs.sendMessage(tab.id, msg);
+}
+
+// chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//   chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
+//     console.log(response.farewell);
 //   });
 // });
