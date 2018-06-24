@@ -1,0 +1,21 @@
+  {
+    "name": "Matricula Libre",
+    "version": "1.0",
+    "description": "Facilitar la matricula en el TEC",
+    "permissions": ["storage", "activeTab"],
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+    },
+    "page_action": {
+      "default_popup": "popup.html"
+    }, 
+    "content_scripts": [
+      {
+        "matches": ["https://tec-appsext.itcr.ac.cr/Matricula/frmMatricula.aspx"],
+        "css": ["myStyles.css"],
+        "js": ["contentScript.js"]
+      }
+    ],
+    "manifest_version": 2
+  }
