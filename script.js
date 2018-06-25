@@ -1,15 +1,22 @@
-console.log("cargaHorarios script ready");
-// window.CargaHorarios("IC7900", "", 1);
-
-// var tempfunc = window.CargaHorarios;
-
-// window.CargaHorarios = function(idMateria, idGrupo, tipo){
-//     tempfunc(idMateria,idGrupo, tipo);
-//     console.log("horarios cargados");
-// }
-
 // Array que contendra las materias y grupos que checkear en cada request
 var suscripcion = [];
+var extensionId = document.getElementById("extensionId");
+var consolaActividad = document.getElementById("consolaActividad");
+
+window.addEventListener("message", function(event) {
+  // We only accept messages from ourselves
+  if (event.source != window)
+    return;
+
+  if (event.data.type && (event.data.type == "FROM_EXTENSION")) {
+    console.log("Se recibieron las suscripciones en la pagina");
+    if(event.data.suscripciones != undefined){
+        console.log(event.data.suscripciones);
+        suscripcion = event.data.suscripciones;
+    }
+  }
+}, false);
+
 
 
 // Aqui se sobreescribe la funcion de CargaHorarios para hacer una edicion en la linea 84 de este documento
@@ -85,7 +92,12 @@ function CargaHorarios(idMateria, idGrupo, tipo) { //si es Tipo 1 es carga norma
                                         .append($("<td class='colHoReservado center'>").html(htmlReservado))
                                         .append($("<td class='colHoEstado center'>").html(data[i].EstadoGrupo))
                                         .append($("<td class='colHoMatricular center'>").html('<img id="' + idMateria + "_" + data[i].IdGrupo + '" class="cBtnMat_' + idMateria + ' imgMatriculaGrupo cImgDesMatriculado"  src="images/notregistered.png"  title="Matricular">'))
-                                        .append($("<td class='suscribir center'>").html('<img id="' + idMateria + '_' + data[i].IdGrupo + '"' + 'src="chrome-extension://mfnppkmeoilpmijpkhjpampnognecbbn/ReloadSingle.png "' + 'onClick="agregarSuscripcion('+ "'"+ idMateria +"','" + data[i].IdGrupo + "');" + '" >')); // se agrega la columna de suscripcion
+                                    if (estaSuscrito(data[i].IdGrupo, idMateria)){
+                                        row.append($("<td class='suscribir center'>").html('<img id="ReloadButton_' + idMateria + '_' + data[i].IdGrupo + '"' + 'src="chrome-extension://'+ document.getElementById("extensionId").textContent +'/ReloadGif.gif "' + 'onClick="agregarSuscripcion('+ "'"+ idMateria +"','" + data[i].IdGrupo + "');" + '" >')); // se agrega la columna de suscripcion
+                                    }
+                                    else{
+                                        row.append($("<td class='suscribir center'>").html('<img id="ReloadButton_' + idMateria + '_' + data[i].IdGrupo + '"' + 'src="chrome-extension://'+ document.getElementById("extensionId").textContent +'/ReloadSingle.png "' + 'onClick="agregarSuscripcion('+ "'"+ idMateria +"','" + data[i].IdGrupo + "');" + '" >')); // se agrega la columna de suscripcion
+                                    }
                                     $('#bodyTableHorarios_' + idMateria).append(row);
                                     htmlHorarios = "", htmlProfesores = "";
                                 }
@@ -148,7 +160,7 @@ function CargaHorarios(idMateria, idGrupo, tipo) { //si es Tipo 1 es carga norma
 }
 
 
-//encontrado en la linea 1013
+//encontrado en la linea 1013 del documento web, aqui se modifica para agregar los reload y otras cosas (por cierto este codigo esta horrible)
 function AddDetalles(idMateria) {
     return '<table class="tHorariosHeader"><thead><tr>' +
         '<td class="colHoSede">Sede</td>' +
@@ -170,51 +182,84 @@ function agregarSuscripcion(idMateria1, idGrupo1){
     // si ya estaba suscrito se de-suscribe y si no estaba se suscribe
     for (let index = 0; index < suscripcion.length; index++) {
         let elemento = suscripcion[index];
-        if(elemento["idGrupo"]=== idGrupo1 && elemento["idMateria"]===idMateria1){
-            document.getElementById(idMateria1+"_"+idGrupo1).src = "chrome-extension://mfnppkmeoilpmijpkhjpampnognecbbn/ReloadSingle.png";
+        if(elemento["idGrupo"]=== idGrupo1 && elemento["idMateria"]===idMateria1){ // se comparan los dos grupos
+            document.getElementById("ReloadButton_" + idMateria1+"_"+idGrupo1).src = "chrome-extension://"+ document.getElementById("extensionId").textContent +"/ReloadSingle.png";
             suscripcion.splice(index);
+            window.postMessage({"type": "FROM_PAGE","suscripciones": suscripcion},"*");
             return;
         }
     }
-    document.getElementById(idMateria1+"_"+idGrupo1).src = "chrome-extension://mfnppkmeoilpmijpkhjpampnognecbbn/ReloadGif.gif";
+    document.getElementById("ReloadButton_" + idMateria1+"_"+idGrupo1).src = "chrome-extension://"+ document.getElementById("extensionId").textContent +"/ReloadGif.gif";
     suscripcion.push({"idMateria" : idMateria1, "idGrupo" : idGrupo1});
+    window.postMessage({"type": "FROM_PAGE","suscripciones": suscripcion},"*");
     return;
 }
 
-function snippets(){
-    // intervalos
-    var interval1 = window.setInterval(imprime,3000);
-    clearInterval(interval1);
-    // Carga un objeto con los horarios
-    function imprime(){
-        var data = CargaHorarios("IC7900",1,2);
-        if(data!=null){
-            console.log(data.Horario);
-        }
-    }
-}
-
+// function snippets(){
+//     // intervalos
+//     var interval1 = window.setInterval(imprime,3000);
+//     clearInterval(interval1);
+//     // Carga un objeto con los horarios
+    // function imprime(){
+    //     var data = CargaHorarios("IC7900",1,2);
+    //     if(data!=null){
+    //         console.log(data.Horario);
+    //     }
+    // }
+// }
+ 
+// funcion que se llamara cada x segundos, la cual carga los cupos refrescados y verifica si hay cupos de las materias sucritas o no
+// y si hay se matricula
 function suscripcionActiva(){
     for (let index = 0; index < suscripcion.length; index++) {
         let elemento = suscripcion[index];
         let informacion = CargaHorarios(elemento["idMateria"], 1, 2);
-        console.log("cargo los horarios - Fun: suscripcionActiva");
-        if(hayCupo(informacion,elemento)){
-            console.log("Si hubo cupo en la suscripcion" + elemento["idMateria"]);
-            CallMatricular(elemento["idMateria"],elemento["idGrupo"]);
+        console.log("Se cargaron los cupos de " + elemento["idMateria"] + "- Funcion: suscripcionActiva");
+        agregarLog("Se cargaron los cupos de " + elemento["idMateria"] + "- Funcion: suscripcionActiva ");
+        console.log("Hay cupo?: " + hayCupo(informacion.Horario,elemento));
+        if(hayCupo(informacion.Horario,elemento)){
+            console.log("Si hubo cupo en la suscripcion: " + elemento["idMateria"]);
+            agregarLog("Si hubo cupo en la suscripcion: " + elemento["idMateria"] + "\n ");
+            // CallMatricular(elemento["idMateria"],elemento["idGrupo"]);
+            // elimina suscripcion
+            suscripcion.splice(index,1);
+            document.getElementById("ReloadButton_" + elemento["idMateria"]+"_"+elemento["idGrupo"]).src = "chrome-extension://"+ document.getElementById("extensionId").textContent +"/ReloadSingle.png";
+            window.postMessage({"type": "FROM_PAGE","suscripciones": suscripcion},"*");
             console.log("se matriculo la materia: " + elemento["idMateria"]);
+            agregarLog("Se matriculo o se intento matricular la materia: " + elemento["idMateria"] + "\n ");
         }
         else{
             console.log("no hubo cupo en la suscripcion: " + elemento["idMateria"] + " , " + elemento["idGrupo"]);
+            agregarLog("no hubo cupo en la suscripcion: " + elemento["idMateria"] + " , " + elemento["idGrupo"] + "\n ");
         }
 
     }
 }
 
+// funcion helper para agregar un log a la caja de logs
+function agregarLog(texto){
+    var textoElement = document.createElement('h2');
+    textoElement.textContent = new Date().toLocaleTimeString() + ": " + texto;
+    textoElement.style ="font-size: 1em; margin: 0;"
+    consolaActividad.prepend(textoElement);
+
+}
+
+function estaSuscrito(idGrupo1, idMateria1){
+    for (let index = 0; index < suscripcion.length; index++) {
+        const suscripcionItem = suscripcion[index];
+        if(suscripcionItem.idMateria == idMateria1 && suscripcionItem.idGrupo == idGrupo1){
+            return true;
+        }
+    }
+    return false;
+}
+
+// verifica si hay cupo en el objeto de informacion que contiene horarios y cupos
 function hayCupo(informacion, grupo){
     for (let index = 0; index < informacion.length; index++) {
         let grupoInformacion = informacion[index];
-        if(grupoInformacion["IdGrupo"]===grupo["idGrupo"] && grupoInformacion["IdMateria"]===grupo["idMateria"]){
+        if(grupoInformacion["IdGrupo"]==grupo["idGrupo"] && grupoInformacion["IdMateria"]==grupo["idMateria"]){
             if(grupoInformacion["CupoDisponible"] > 0){
                 return true;
             }
@@ -228,3 +273,19 @@ function hayCupo(informacion, grupo){
 }
 
 var intervaloPrincipal = window.setInterval(suscripcionActiva, 3000);
+
+// funcion para mantener la sesion viva
+function heartBeat(){
+    var data = CargaHorarios("IC7900",1,2);
+    if(data!=null){
+        console.log(new Date().toLocaleTimeString());
+        console.log(data.Horario);
+    }
+}
+
+// cada 60 segundos
+var intervaloHeartBeat = window.setInterval(heartBeat, 60000);
+
+// 02A1E3C37F0436A16285011DC8A70A8FA9368B20ABEEA94B44FB3BD8B15F200F02721926590BADB355EA6F430BFB947DBFAA7ABED884EBDD719EB0742AB8A02169AAEF92EF4F7BA9D3C86999629781F4344874295118A4E116C5692CE2D9E8CAD42019CAC614A29664E19C544274D6B93EA9D93895C10D5504D5CAF8902F646883092A2249C47A738C836C4B2559B809
+// ACcPK0kBAAoSyFxZA/UKHw$$
+// hzc1gqwetmwmpommci0wdg5e
