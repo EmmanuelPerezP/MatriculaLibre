@@ -1,5 +1,6 @@
 # MatriculaLibre
 > Extension de Chrome que facilita la matricula para el tecnologico de costa rica.
+![](screenshot2.png)
 
 ## Instalacion
 
@@ -11,6 +12,10 @@ https://developer.chrome.com/extensions
 
 ## Release History
 
+* 1.1.1
+    * Quitar algunos console.logs
+* 1.1
+    * Arreglados unos bugs y cambiado de lado la consola
 * 1.0
     * Primer release
 
