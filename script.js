@@ -189,6 +189,7 @@ function agregarSuscripcion(idMateria1, idGrupo1){
             return;
         }
     }
+    agregarLog("Se suscribio a la materia \n");
     document.getElementById("ReloadButton_" + idMateria1+"_"+idGrupo1).src = "chrome-extension://"+ document.getElementById("extensionId").textContent +"/ReloadGif.gif";
     suscripcion.push({"idMateria" : idMateria1, "idGrupo" : idGrupo1});
     window.postMessage({"type": "FROM_PAGE","suscripciones": suscripcion},"*");
@@ -235,7 +236,6 @@ function suscripcionActiva(){
             }
         }
         else {
-            console.log("no estamos en la hora de matricula \n");
         }
 
     }
@@ -283,8 +283,7 @@ var intervaloPrincipal = window.setInterval(suscripcionActiva, 1000);
 function heartBeat(){
     var data = CargaHorarios("IC7900",1,2);
     if(data!=null){
-        console.log(new Date().toLocaleTimeString());
-        console.log(data.Horario);
+        console.log("Heartbeat at: " + new Date().toLocaleTimeString());
     }
 }
 
