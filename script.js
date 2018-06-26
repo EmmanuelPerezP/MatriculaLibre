@@ -212,25 +212,30 @@ function agregarSuscripcion(idMateria1, idGrupo1){
 // y si hay se matricula
 function suscripcionActiva(){
     for (let index = 0; index < suscripcion.length; index++) {
-        let elemento = suscripcion[index];
-        let informacion = CargaHorarios(elemento["idMateria"], 1, 2);
-        console.log("Se cargaron los cupos de " + elemento["idMateria"] + "- Funcion: suscripcionActiva");
-        agregarLog("Se cargaron los cupos de " + elemento["idMateria"] + "- Funcion: suscripcionActiva ");
-        console.log("Hay cupo?: " + hayCupo(informacion.Horario,elemento));
-        if(hayCupo(informacion.Horario,elemento)){
-            console.log("Si hubo cupo en la suscripcion: " + elemento["idMateria"]);
-            agregarLog("Si hubo cupo en la suscripcion: " + elemento["idMateria"] + "\n ");
-            // CallMatricular(elemento["idMateria"],elemento["idGrupo"]);
-            // elimina suscripcion
-            suscripcion.splice(index,1);
-            document.getElementById("ReloadButton_" + elemento["idMateria"]+"_"+elemento["idGrupo"]).src = "chrome-extension://"+ document.getElementById("extensionId").textContent +"/ReloadSingle.png";
-            window.postMessage({"type": "FROM_PAGE","suscripciones": suscripcion},"*");
-            console.log("se matriculo la materia: " + elemento["idMateria"]);
-            agregarLog("Se matriculo o se intento matricular la materia: " + elemento["idMateria"] + "\n ");
+        if(new Date(objCita.FECHA.toLocaleString()) < Date.now()){
+            let elemento = suscripcion[index];
+            let informacion = CargaHorarios(elemento["idMateria"], 1, 2);
+            console.log("Se cargaron los cupos de " + elemento["idMateria"] + "- Funcion: suscripcionActiva");
+            agregarLog("Se cargaron los cupos de " + elemento["idMateria"] + "- Funcion: suscripcionActiva ");
+            console.log("Hay cupo?: " + hayCupo(informacion.Horario,elemento));
+            if(hayCupo(informacion.Horario,elemento)){
+                console.log("Si hubo cupo en la suscripcion: " + elemento["idMateria"]);
+                agregarLog("Si hubo cupo en la suscripcion: " + elemento["idMateria"] + "\n ");
+                CallMatricular(elemento["idMateria"],elemento["idGrupo"]);
+                // elimina suscripcion
+                suscripcion.splice(index,1);
+                document.getElementById("ReloadButton_" + elemento["idMateria"]+"_"+elemento["idGrupo"]).src = "chrome-extension://"+ document.getElementById("extensionId").textContent +"/ReloadSingle.png";
+                window.postMessage({"type": "FROM_PAGE","suscripciones": suscripcion},"*");
+                console.log("se matriculo la materia: " + elemento["idMateria"]);
+                agregarLog("Se matriculo o se intento matricular la materia: " + elemento["idMateria"] + "\n ");
+            }
+            else {
+                console.log("no hubo cupo en la suscripcion: " + elemento["idMateria"] + " , " + elemento["idGrupo"]);
+                agregarLog("no hubo cupo en la suscripcion: " + elemento["idMateria"] + " , " + elemento["idGrupo"] + "\n ");
+            }
         }
-        else{
-            console.log("no hubo cupo en la suscripcion: " + elemento["idMateria"] + " , " + elemento["idGrupo"]);
-            agregarLog("no hubo cupo en la suscripcion: " + elemento["idMateria"] + " , " + elemento["idGrupo"] + "\n ");
+        else {
+            console.log("no estamos en la hora de matricula \n");
         }
 
     }
@@ -272,7 +277,7 @@ function hayCupo(informacion, grupo){
     }
 }
 
-var intervaloPrincipal = window.setInterval(suscripcionActiva, 3000);
+var intervaloPrincipal = window.setInterval(suscripcionActiva, 1000);
 
 // funcion para mantener la sesion viva
 function heartBeat(){
@@ -284,4 +289,4 @@ function heartBeat(){
 }
 
 // cada 60 segundos
-var intervaloHeartBeat = window.setInterval(heartBeat, 60000);
+var intervaloHeartBeat = window.setInterval(heartBeat, 120000);
