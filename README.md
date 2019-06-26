@@ -12,6 +12,10 @@ https://developer.chrome.com/extensions
 
 ## Release History
 
+* 1.2.1
+    * Cambiado style del moxdi button
+* 1.2
+    * Agregado moxdi button
 * 1.1.1
     * Quitar algunos console.logs
 * 1.1
