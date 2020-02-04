@@ -18,7 +18,6 @@ window.addEventListener("message", function(event) {
 }, false);
 
 
-
 // Aqui se sobreescribe la funcion de CargaHorarios para hacer una edicion en la linea 84 de este documento
 function CargaHorarios(idMateria, idGrupo, tipo) { //si es Tipo 1 es carga normal, sino es retorno de información.
     var datosHorario;
@@ -131,7 +130,7 @@ function CargaHorarios(idMateria, idGrupo, tipo) { //si es Tipo 1 es carga norma
                             $('.cBtnMat_' + idMateria).on("click", function () {
                                 var idBtn = $(this).attr("id");
                                 idGrupo = idBtn.split('_')[1];
-                                SeleccionaGrupo(idMateria, idGrupo);
+                                ObtieneGrupo(idMateria, idGrupo);
                             });
 
                         } else {
@@ -208,6 +207,11 @@ function agregarSuscripcion(idMateria1, idGrupo1){
     //     }
     // }
 // }
+
+console.log("felicidades tec, tratas de matar la innovacion al ofuscar el codigo y hacer que no funcione en firefox, la proxima nada mas me mandas un correo y puedo ayudar con lo que uds quieran no tenian que hacer eso.");
+
+// CallMatricular
+// CargaHorarios
  
 // funcion que se llamara cada x segundos, la cual carga los cupos refrescados y verifica si hay cupos de las materias sucritas o no
 // y si hay se matricula
@@ -222,7 +226,7 @@ function suscripcionActiva(){
             if(hayCupo(informacion.Horario,elemento)){
                 console.log("Si hubo cupo en la suscripcion: " + elemento["idMateria"]);
                 agregarLog("Si hubo cupo en la suscripcion: " + elemento["idMateria"] + "\n ");
-                CallMatricular(elemento["idMateria"],elemento["idGrupo"]);
+                GeneraMatricula(elemento["idMateria"],elemento["idGrupo"]);
                 // elimina suscripcion
                 suscripcion.splice(index,1);
                 document.getElementById("ReloadButton_" + elemento["idMateria"]+"_"+elemento["idGrupo"]).src = "chrome-extension://"+ document.getElementById("extensionId").textContent +"/ReloadSingle.png";
@@ -247,7 +251,6 @@ function agregarLog(texto){
     textoElement.textContent = new Date().toLocaleTimeString() + ": " + texto;
     textoElement.style ="font-size: 1em; margin: 0;"
     consolaActividad.prepend(textoElement);
-
 }
 
 function estaSuscrito(idGrupo1, idMateria1){
@@ -272,8 +275,6 @@ function hayCupo(informacion, grupo){
                 return false;
             }
         }
-
-        
     }
 }
 
@@ -289,3 +290,9 @@ function heartBeat(){
 
 // cada 60 segundos
 var intervaloHeartBeat = window.setInterval(heartBeat, 120000);
+
+
+setTimeout(() => {
+    // agregarLog(JSON.stringify(objCita));
+    // agregarLog(JSON.stringify(CargaHorarios("IC7900", 1, 2)));
+}, 3000);

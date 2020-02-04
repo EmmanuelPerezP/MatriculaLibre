@@ -38,7 +38,7 @@ var moxdibut = document.createElement('a');
 moxdibut.id = "moxdiButt";
 moxdibut.style = "margin:1.5rem;position: fixed;bottom: 0px;display: inline-block;padding: .5rem;font-size: 1rem;cursor: pointer;text-align: center;text-decoration: none;outline: none;color: #00FFCE;background-color: #1A1F1E;border: none; border-radius: 5px;";
 moxdibut.href = "https://www.moxdi.com";
-moxdibut.textContent = "Visita Moxdi";
+moxdibut.textContent = "Visita mi otro proyecto Moxdi";
 
 
 var s = document.createElement('script');
